@@ -43,12 +43,14 @@ class Server {
         await this.database.connect();
     };
 
-  
-
     listen = async (): Promise<void> => {
-        await this.connectDB();
-
-
+        // await this.connectDB();
+        await this.database.createConnections();
+        setInterval(async () => {
+            await this.database.checkConnections();
+        }, 10000)
+        // await this.database.disconnectConnection("connection1");
+        // await this.database.disconnectConnection("connection2");
         this.app.listen(this.config.port, () => {
             // eslint-disable-next-line no-console
             console.log(`App listening on port ${this.config.port}`);
