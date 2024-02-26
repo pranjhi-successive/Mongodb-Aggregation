@@ -3,14 +3,12 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import { typeDefs } from "./schema";
 import { resolvers } from "./resolver";
 import { ComplianceStatAPI } from "./datasources/api";
-
-async function startApolloServer() {
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+export async function startApolloServer() {
   const server = new ApolloServer({ typeDefs, resolvers });
   const { url } = await startStandaloneServer(server, {
     context: async ({ req }) => {
-      // Access request headers here
       const headers = req.headers;
-      // Return an object with headers and any other context properties you need
       return {
         headers,
         dataSources: {
@@ -24,5 +22,18 @@ async function startApolloServer() {
     📭  Query at ${url}
   `);
 }
+
+
+export function getTestServer(httpServer:any) {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  }
+  );
+
+  return server;
+}
+
 
 startApolloServer();
